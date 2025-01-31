@@ -4,7 +4,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
-
+import allure
 
 load_dotenv()
 
@@ -19,6 +19,7 @@ class CartPage:
     def __init__(self, browser):
         self.browser = browser
 
+    @allure.step("Открыть главную страницу")
     def open(self):
         """Открыть главную страницу"""
         try:
@@ -32,6 +33,7 @@ class CartPage:
             logging.error(f"Не удалось открыть страницу {self.URL}: {e}")
             raise
 
+    @allure.step("Выбрать категорию товаров")
     def select_category(self):
         """Выбрать категорию, чтобы увидеть товары"""
         try:
@@ -45,6 +47,7 @@ class CartPage:
             logging.error(f"Не удалось выбрать категорию: {e}")
             raise
 
+    @allure.step("Добавить товар в корзину")
     def add_item_to_cart(self):
         """Добавить товар в корзину"""
         try:
@@ -58,6 +61,7 @@ class CartPage:
             logging.error(f"Не удалось добавить товар в корзину: {e}")
             raise
 
+    @allure.step("Открыть корзину")
     def open_cart(self):
         """Открыть корзину"""
         try:
@@ -71,6 +75,7 @@ class CartPage:
             logging.error(f"Не удалось открыть корзину: {e}")
             raise
 
+    @allure.step("Заполнить форму в корзине")
     def fill_in_cart_form(self, name, phone):
         """Заполнить форму в корзине"""
         try:
@@ -89,6 +94,7 @@ class CartPage:
             logging.error(f"Не удалось заполнить форму в корзине: {e}")
             raise
 
+    @allure.step("Отправить заказ")
     def submit_order(self):
         """Отправить заказ"""
         try:
@@ -102,6 +108,7 @@ class CartPage:
             logging.error(f"Не удалось отправить заказ: {e}")
             raise
 
+    @allure.step("Проверить, пуста ли корзина")
     def is_cart_empty(self):
         """Проверить, что корзина пуста"""
         try:
@@ -118,6 +125,7 @@ class CartPage:
             logging.error(f"Не удалось проверить, пуста ли корзина: {e}")
             return False
 
+    @allure.step("Удалить товар из корзины")
     def remove_item_from_cart(self):
         """Удалить товар из корзины"""
         try:

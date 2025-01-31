@@ -1,3 +1,4 @@
+import allure
 import pytest
 import requests
 import os
@@ -42,21 +43,36 @@ def modify_cart(item_id, action):
 
 
 @pytest.mark.parametrize("item_id", [642])
+@allure.feature('Корзина (API)')
+@allure.story('Добавление товара в корзину')
+@allure.severity(allure.severity_level.NORMAL)
 def test_add_item_to_cart(item_id):
-    response = modify_cart(item_id, "add")
+    with allure.step(f"Добавляем товар с ID {item_id} в корзину"):
+        response = modify_cart(item_id, "add")
+
     assert response.status_code == 200, "Ошибка добавления товара в корзину"
     assert "1" in response.text, "Некорректный ответ при добавлении товара"
 
 
 @pytest.mark.parametrize("item_id", [642])
+@allure.feature('Корзина (API)')
+@allure.story('Увеличение количества товара')
+@allure.severity(allure.severity_level.MINOR)
 def test_increase_item_quantity(item_id):
-    response = modify_cart(item_id, "plus")
+    with allure.step(f"Увеличиваем количество товара с ID {item_id}"):
+        response = modify_cart(item_id, "plus")
+
     assert response.status_code == 200, "Ошибка увеличения количества товара"
     assert any(char.isdigit() and int(char) > 1 for char in response.text), "Количество товара не увеличилось"
 
 
 @pytest.mark.parametrize("item_id", [642])
+@allure.feature('Корзина (API)')
+@allure.story('Удаление товара из корзины')
+@allure.severity(allure.severity_level.TRIVIAL)
 def test_remove_item_from_cart(item_id):
-    response = modify_cart(item_id, "delete")
+    with allure.step(f"Удаляем товар с ID {item_id} из корзины"):
+        response = modify_cart(item_id, "delete")
+
     assert response.status_code == 200, "Ошибка удаления товара из корзины"
     assert "0" in response.text, "Некорректный ответ при удалении товара"

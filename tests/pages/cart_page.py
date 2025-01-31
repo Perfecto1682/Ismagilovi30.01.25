@@ -1,11 +1,14 @@
 import logging
-import os
 from dotenv import load_dotenv
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
-import requests
+
+
+load_dotenv()
+
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s', force=True)
 
 
 class CartPage:
@@ -24,6 +27,7 @@ class CartPage:
             WebDriverWait(self.browser, 40).until(
                 EC.presence_of_element_located((By.TAG_NAME, "body"))
             )
+            logging.info("Страница успешно загружена")
         except TimeoutException as e:
             logging.error(f"Не удалось открыть страницу {self.URL}: {e}")
             raise
@@ -55,7 +59,7 @@ class CartPage:
             raise
 
     def open_cart(self):
-        """Открыть корзину для заполнения формы"""
+        """Открыть корзину"""
         try:
             logging.info("Попытка открыть корзину")
             cart_icon = WebDriverWait(self.browser, 10).until(
@@ -70,9 +74,8 @@ class CartPage:
     def fill_in_cart_form(self, name, phone):
         """Заполнить форму в корзине"""
         try:
-            logging.info("Заполнение формы в корзине")
+            logging.info(f"Заполнение формы: Имя - {name}, Телефон - {phone}")
 
-            # Заполнение полей формы
             WebDriverWait(self.browser, 10).until(
                 EC.visibility_of_element_located((By.CSS_SELECTOR, "input[class*='name']"))
             ).send_keys(name)
@@ -107,8 +110,9 @@ class CartPage:
                 EC.visibility_of_element_located((By.CSS_SELECTOR, "#order-list h2"))
             )
             if "Корзина пуста" in empty_message.text:
-                logging.info("Корзина пуста")
+                logging.info("Корзина действительно пуста")
                 return True
+            logging.info("Корзина не пуста")
             return False
         except TimeoutException as e:
             logging.error(f"Не удалось проверить, пуста ли корзина: {e}")
@@ -126,48 +130,3 @@ class CartPage:
         except TimeoutException as e:
             logging.error(f"Не удалось удалить товар из корзины: {e}")
             raise
-
-
-# Загружаем переменные из .env
-load_dotenv()
-
-
-class CartAPI:
-    BASE_URL = "https://www.sibdar-spb.ru/ajax/basketOrder.php"
-
-    @staticmethod
-    def get_headers():
-        """Возвращает заголовки из .env"""
-        return {
-            "accept": os.getenv("ACCEPT"),
-            "content-type": os.getenv("CONTENT_TYPE"),
-            "origin": os.getenv("ORIGIN"),
-            "referer": os.getenv("REFERER"),
-            "user-agent": os.getenv("USER_AGENT"),
-            "x-requested-with": os.getenv("X_REQUESTED_WITH")
-        }
-
-    @staticmethod
-    def get_cookies():
-        """Возвращает куки из .env"""
-        return {
-            "CONSENT": os.getenv("CONSENT"),
-            "basketor": os.getenv("BASKETOR"),
-            "PHPSESSID": os.getenv("PHPSESSID"),
-            "SLO_G_WPT_TO": os.getenv("SLO_G_WPT_TO"),
-            "SLO_GWPT_Show_Hide_tmp": os.getenv("SLO_GWPT_Show_Hide_tmp"),
-            "SLO_wptGlobTipTmp": os.getenv("SLO_wptGlobTipTmp")
-        }
-
-    @staticmethod
-    def modify_cart(item_id, action):
-        """Отправляет запрос на изменение содержимого корзины"""
-        payload = (f"data=%7B%22idCookie%22%3A%22{os.getenv('BASKETOR')}%"
-                   f"22%2C%22idProd%22%3A%22{item_id}%22%2C%22type%22%3A%22{action}%22%7D")
-        response = requests.post(
-            CartAPI.BASE_URL,
-            data=payload,
-            headers=CartAPI.get_headers(),
-            cookies=CartAPI.get_cookies()
-        )
-        return response

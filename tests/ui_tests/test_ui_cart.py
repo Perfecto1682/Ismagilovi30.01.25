@@ -1,4 +1,4 @@
-from pages.cart_page import CartPage
+from tests.pages.cart_page import CartPage
 
 
 def test_add_item_to_cart(browser):
